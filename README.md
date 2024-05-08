@@ -58,7 +58,7 @@ Then use the deploy script to build and deploy the infrastructure:
 
 ```shell
 # NOTE: Populate the variables.
-`CSP= IDENTIFIER= REGISTRY_NAME= REPOSITORY_NAME= IMAGE_NAME= bash scripts/deploy.sh`.
+CSP= IDENTIFIER= REGISTRY_NAME= REPOSITORY_NAME= IMAGE_NAME= bash scripts/deploy.sh
 ```
 
 ## Post-Deployment Setup
