@@ -1,0 +1,57 @@
+# This pipeline expects the following variables part of the environment.
+# * CSP: Cloud Service Provider.
+# * IDENTIFIER: Identifier of the subscription or project.
+# * REGISTRY: Name of the container registry.
+# * REPOSITORY: Name of the repository within the registry to push the image to.
+# NOTE: Further secrets will be required to login to the mentioned CSP,
+# both for accessing the Terraform backend and pushing to the registry.
+
+name: CD - Build and Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    # TODO: Remove false to enable.
+    if: false && github.ref == 'refs/heads/"main"' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout infrastructure repository
+        uses: actions/checkout@v4
+
+      - name: Checkout api repository
+        uses: actions/checkout@v4
+        with:
+          repository: "https://github.com/NielsDegrande/api"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: "api"
+
+      - name: Checkout ui repository
+        uses: actions/checkout@v4
+        with:
+          repository: "https://github.com/NielsDegrande/ui"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: "ui"
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Initialize
+        run: |
+          bash scripts/init.sh
+
+      - name: Deploy
+        run: |
+          CSP={{ env.CSP }}
+          IDENTIFIER={{ env.IDENTIFIER }}
+          REGISTRY_NAME={{ env.REGISTRY_NAME }}
+          REPOSITORY_NAME={{ env.REPOSITORY_NAME }}
+          bash scripts/deploy.sh

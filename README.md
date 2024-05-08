@@ -54,11 +54,18 @@ Initialize (one-time setup) with
 CSP= IDENTIFIER= bash scripts/init.sh`.
 ```
 
+For local use, you can create symbolic links to the API and UI repository.
+
+```shell
+ln -s {absolute_path_to_api_repo} api
+ln -s {absolute_path_to_ui_repo} ui
+```
+
 Then use the deploy script to build and deploy the infrastructure:
 
 ```shell
 # NOTE: Populate the variables.
-CSP= IDENTIFIER= REGISTRY_NAME= REPOSITORY_NAME= IMAGE_NAME= bash scripts/deploy.sh
+CSP= IDENTIFIER= REGISTRY_NAME= REPOSITORY_NAME= bash scripts/deploy.sh
 ```
 
 ## Post-Deployment Setup
