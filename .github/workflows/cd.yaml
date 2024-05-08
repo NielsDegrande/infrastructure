@@ -13,14 +13,11 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   build-and-deploy:
     # TODO: Remove false to enable.
-    if: false && github.ref == 'refs/heads/"main"' && github.event_name == 'push'
+    if: false
     runs-on: ubuntu-latest
 
     steps:
