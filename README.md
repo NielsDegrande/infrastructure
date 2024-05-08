@@ -5,7 +5,9 @@
 This repository holds infrastructure as code.
 Terraform is used to provision the infrastructure.
 
-## Prerequisites
+## Getting Started
+
+### Prerequisites
 
 - [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
@@ -13,8 +15,6 @@ You need to install the CLI tool for the cloud provider you are using:
 
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
 - [gcloud CLI](https://cloud.google.com/sdk/docs/install)
-
-## Getting Started
 
 ### Installation
 
@@ -31,17 +31,17 @@ you need to install ShellCheck, e.g. with:
 brew install shellcheck
 ```
 
-## Create a backend
+### Create a backend
 
 This is a one-time setup. It is not part of this infra-as-code.
 Populate the `backend.conf` with the required values.
 
-### Azure
+#### Azure
 
 Create a storage account and a container to store the Terraform state.
 NOTE: It might be required to add the `object_id` of the principal running `terraform apply` to the key vault with Get key permissions.
 
-### GCP
+#### GCP
 
 Create a bucket to store the Terraform state.
 
