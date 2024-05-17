@@ -10,11 +10,10 @@ Example: `bash scripts/build_ui.sh`.
 # Print commands before executing.
 set -eux
 
-find api/ui -type f ! -name '*.py' -delete
 (
     cd ui || exit
-    # Build the UI.
-    yarn build
+    # Bundle the UI.
+    bun run build
 
 )
 mv ui/dist/* api/ui/
