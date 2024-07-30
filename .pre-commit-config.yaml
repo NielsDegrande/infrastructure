@@ -30,3 +30,13 @@ repos:
     hooks:
       - id: codespell
         types_or: [markdown]
+  - repo: local
+    hooks:
+      - id: terrascan
+        name: terrascan
+        language: system
+        require_serial: true
+        entry: bash -c '
+          terrascan scan -c terrascan.toml -i terraform -d terraform/gcp &&
+          terrascan scan -c terrascan.toml -i terraform -d terraform/azure &&
+          terrascan scan -c terrascan.toml -i docker -d .'

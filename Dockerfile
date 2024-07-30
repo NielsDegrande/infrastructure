@@ -7,9 +7,9 @@ WORKDIR /app/
 
 # Dependencies for pre-commit.
 RUN apt-get update \
-    && apt-get install git build-essential shellcheck -y \
+    && apt-get install git build-essential shellcheck terrascan -y \
     && apt-get clean
-RUN pip install pre-commit
+RUN pip install --no-cache-dir pre-commit
 COPY .pre-commit-config.yaml .pre-commit-config.yaml
 
 # Install pre-commit hooks.

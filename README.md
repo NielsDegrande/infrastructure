@@ -31,6 +31,12 @@ you need to install ShellCheck, e.g. with:
 brew install shellcheck
 ```
 
+Similarly, for `terraform` you need to install:
+
+```shell
+brew install terrascan
+```
+
 ### Create a backend
 
 This is a one-time setup. It is not part of this infra-as-code.

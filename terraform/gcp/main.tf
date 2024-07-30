@@ -61,6 +61,10 @@ resource "google_sql_database_instance" "db" {
   settings {
     tier    = "db-perf-optimized-N-2"
     edition = "ENTERPRISE_PLUS"
+    ip_configuration {
+      require_ssl = true
+      ssl_mode    = "TRUSTED_CLIENT_CERTIFICATE_REQUIRED"
+    }
   }
 }
 
