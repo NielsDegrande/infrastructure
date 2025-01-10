@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "< 4.0.0"
+      version = "4.14.0"
     }
   }
 
@@ -22,23 +22,9 @@ resource "azurerm_resource_group" "resource_group" {
   location = var.location
 }
 
-resource "azurerm_postgresql_flexible_server" "database" {
-  name                   = "${var.resource_group_name_prefix}-${var.environment}-${var.database_suffix}"
-  resource_group_name    = azurerm_resource_group.resource_group.name
-  location               = var.location
-  administrator_login    = var.database_administrator_login
-  administrator_password = var.database_administrator_password
-  sku_name               = var.database_sku
-  version                = var.database_version
-  zone                   = 2
-}
-
-resource "azurerm_container_registry" "container_registry" {
-  name                = "${var.resource_group_name_prefix}${var.environment}${var.acr_suffix}"
-  resource_group_name = azurerm_resource_group.resource_group.name
-  location            = var.location
-  sku                 = var.acr_sku
-  admin_enabled       = true
+data "azurerm_key_vault_secret" "db_password" {
+  name         = "db-password"
+  key_vault_id = azurerm_key_vault.key_vault.id
 }
 
 resource "azurerm_key_vault" "key_vault" {
@@ -49,6 +35,27 @@ resource "azurerm_key_vault" "key_vault" {
   sku_name                   = var.kv_sku
   purge_protection_enabled   = true
   soft_delete_retention_days = 7
+}
+
+resource "azurerm_postgresql_flexible_server" "database" {
+  name                         = "${var.resource_group_name_prefix}-${var.environment}-${var.database_suffix}"
+  resource_group_name          = azurerm_resource_group.resource_group.name
+  location                     = var.location
+  administrator_login          = var.database_administrator_login
+  administrator_password       = data.azurerm_key_vault_secret.db_password.value
+  sku_name                     = var.database_sku
+  version                      = var.database_version
+  zone                         = 2
+  geo_redundant_backup_enabled = true
+}
+
+resource "azurerm_container_registry" "container_registry" {
+  name                     = "${var.resource_group_name_prefix}${var.environment}${var.acr_suffix}"
+  resource_group_name      = azurerm_resource_group.resource_group.name
+  location                 = var.location
+  sku                      = var.acr_sku
+  admin_enabled            = true
+  retention_policy_in_days = 7
 }
 
 resource "azurerm_key_vault_key" "key_vault_key" {
@@ -80,12 +87,24 @@ resource "azurerm_key_vault_access_policy" "managed_identity_access" {
 }
 
 resource "azurerm_storage_account" "storage_account" {
-  name                     = "${var.resource_group_name_prefix}${var.environment}${var.sa_suffix}"
-  resource_group_name      = azurerm_resource_group.resource_group.name
-  location                 = var.location
-  account_tier             = var.sa_account_tier
-  account_replication_type = var.sa_replication_type
+  name                            = "${var.resource_group_name_prefix}${var.environment}${var.sa_suffix}"
+  resource_group_name             = azurerm_resource_group.resource_group.name
+  location                        = var.location
+  account_tier                    = var.sa_account_tier
+  account_replication_type        = var.sa_replication_type
+  allow_nested_items_to_be_public = false
+  min_tls_version                 = "TLS1_2"
 
+  blob_properties {
+    delete_retention_policy {
+      days = 7
+    }
+  }
+
+  sas_policy {
+    expiration_period = "90.00:00:00"
+    expiration_action = "Log"
+  }
   identity {
     type         = "UserAssigned"
     identity_ids = [resource.azurerm_user_assigned_identity.managed_identity.id]
@@ -103,7 +122,7 @@ resource "azurerm_storage_account" "storage_account" {
 resource "azurerm_storage_container" "storage_container" {
   for_each              = toset(var.container_names)
   name                  = each.value
-  storage_account_name  = azurerm_storage_account.storage_account.name
+  storage_account_id    = azurerm_storage_account.storage_account.id
   container_access_type = var.container_access_type
 }
 
@@ -116,10 +135,12 @@ resource "azurerm_service_plan" "app_service_plan" {
 }
 
 resource "azurerm_linux_web_app" "app_service" {
-  name                = "${var.resource_group_name_prefix}-${var.environment}-${var.app_service_name_suffix}"
-  resource_group_name = azurerm_resource_group.resource_group.name
-  location            = var.location
-  service_plan_id     = azurerm_service_plan.app_service_plan.id
+  name                       = "${var.resource_group_name_prefix}-${var.environment}-${var.app_service_name_suffix}"
+  resource_group_name        = azurerm_resource_group.resource_group.name
+  location                   = var.location
+  service_plan_id            = azurerm_service_plan.app_service_plan.id
+  client_certificate_enabled = true
+  https_only                 = true
 
   app_settings = {
     BLOB_ACCOUNT_KEY       = azurerm_storage_account.storage_account.primary_access_key
@@ -128,7 +149,7 @@ resource "azurerm_linux_web_app" "app_service" {
     DB_DIALECT             = "postgresql+asyncpg"
     DB_HOST                = azurerm_postgresql_flexible_server.database.fqdn
     DB_NAME                = "postgres"
-    DB_PASSWORD            = var.database_administrator_password
+    DB_PASSWORD            = data.azurerm_key_vault_secret.db_password.value
     DB_PORT                = "5432"
     DB_USER                = var.database_administrator_login
     ENVIRONMENT            = var.environment
@@ -141,9 +162,15 @@ resource "azurerm_linux_web_app" "app_service" {
       docker_registry_username = azurerm_container_registry.container_registry.admin_username
       docker_registry_password = azurerm_container_registry.container_registry.admin_password
     }
+    ftps_state = "FtpsOnly"
+    health_check_path = var.health_check_path
+    http2_enabled = true
   }
 
-  https_only = true
+  logs {
+    detailed_error_messages = true
+    failed_request_tracing = true
+  }
 }
 
 resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {

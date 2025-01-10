@@ -31,12 +31,6 @@ you need to install ShellCheck, e.g. with:
 brew install shellcheck
 ```
 
-Similarly, for `terraform` you need to install:
-
-```shell
-brew install terrascan
-```
-
 ### Create a backend
 
 This is a one-time setup. It is not part of this infra-as-code.
@@ -46,6 +40,18 @@ Populate the `backend.conf` with the required values.
 
 Create a storage account and a container to store the Terraform state.
 NOTE: It might be required to add the `object_id` of the principal running `terraform apply` to the key vault with Get key permissions.
+
+##### First-Time Setup
+
+A first deploy will typically fail because the Key Vault is not yet populated with the required secrets.
+
+One can deploy the Key Vault separately:
+
+```shell
+terraform apply -target=azurerm_key_vault.key_vault
+```
+
+Then manually add the "db-password" secret in the Key Vault. Then run `terraform apply` again to finish the deployment.
 
 #### GCP
 

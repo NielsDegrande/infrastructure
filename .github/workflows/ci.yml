@@ -1,20 +1,22 @@
 name: CI - Lint
 
+permissions: read-all
+
 on:
   push:
     branches:
-    - main
+      - main
   pull_request:
     branches:
-    - main
+      - main
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-    - name: Run pre-commit
-      run: make run_pre_commit
+      - name: Run pre-commit
+        run: make run_pre_commit

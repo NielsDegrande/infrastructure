@@ -32,12 +32,6 @@ variable "database_administrator_login" {
   default     = "postgres"
 }
 
-variable "database_administrator_password" {
-  type        = string
-  description = "The administrator password for the database."
-  sensitive   = true
-}
-
 variable "database_sku" {
   type        = string
   description = "SKU tier for the database."
@@ -61,7 +55,8 @@ variable "acr_suffix" {
 variable "acr_sku" {
   type        = string
   description = "SKU for the ACR."
-  default     = "Basic"
+  # Standard not Basic to allow for vulnerability scanning.
+  default     = "Standard"
 }
 
 # Storage Account.
@@ -158,4 +153,9 @@ variable "docker_registry_url" {
 
 variable "docker_image_name" {
   description = "The Docker image to deploy."
+}
+
+variable "health_check_path" {
+  description = "The health check path for the App Service."
+  default     = "/api/docs"
 }

@@ -8,6 +8,8 @@
 
 name: CD - Build and Deploy
 
+permissions: read-all
+
 on:
   workflow_dispatch:
   push:

@@ -30,13 +30,15 @@ repos:
     hooks:
       - id: codespell
         types_or: [markdown]
-  - repo: local
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+    rev: v1.1.2
     hooks:
-      - id: terrascan
-        name: terrascan
-        language: system
+      - id: dockerfile_lint
+  - repo: https://github.com/bridgecrewio/checkov
+    rev: 3.2.216
+    hooks:
+      - id: checkov
+        name: checkov
+        language: python
         require_serial: true
-        entry: bash -c '
-          terrascan scan -c terrascan.toml -i terraform -d terraform/gcp &&
-          terrascan scan -c terrascan.toml -i terraform -d terraform/azure &&
-          terrascan scan -c terrascan.toml -i docker -d .'
+        args: [--quiet]

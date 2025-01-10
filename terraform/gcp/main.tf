@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 1.8"
 
   required_providers {
-    google = ">= 5.8.0"
+    google = ">= 6.3.0"
   }
 
   backend "gcs" {}
@@ -61,9 +61,48 @@ resource "google_sql_database_instance" "db" {
   settings {
     tier    = "db-perf-optimized-N-2"
     edition = "ENTERPRISE_PLUS"
+
+    backup_configuration {
+      enabled = True
+    }
+    database_flags {
+      name  = "log_duration"
+      value = "on"
+    }
+    database_flags {
+      name  = "log_lock_waits"
+      value = "on"
+    }
+    database_flags {
+      name  = "log_statement"
+      value = "all"
+    }
+    database_flags {
+      name  = "log_min_messages"
+      value = "ERROR"
+    }
+    database_flags {
+      name  = "log_disconnections"
+      value = "on"
+    }
+    database_flags {
+      name  = "log_checkpoints"
+      value = "on"
+    }
+    database_flags {
+      name  = "log_hostname"
+      value = "on"
+    }
+    database_flags {
+      name  = "log_connections"
+      value = "on"
+    }
+    database_flags {
+      name  = "pgaudit.log"
+      value = "'all'"
+    }
     ip_configuration {
-      require_ssl = true
-      ssl_mode    = "TRUSTED_CLIENT_CERTIFICATE_REQUIRED"
+      ssl_mode = "TRUSTED_CLIENT_CERTIFICATE_REQUIRED"
     }
   }
 }
@@ -228,4 +267,7 @@ resource "google_storage_bucket" "create_bucket" {
 
   public_access_prevention    = "enforced"
   uniform_bucket_level_access = true
+  versioning = {
+    enabled = true
+  }
 }
