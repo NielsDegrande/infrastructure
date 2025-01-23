@@ -162,14 +162,14 @@ resource "azurerm_linux_web_app" "app_service" {
       docker_registry_username = azurerm_container_registry.container_registry.admin_username
       docker_registry_password = azurerm_container_registry.container_registry.admin_password
     }
-    ftps_state = "FtpsOnly"
+    ftps_state        = "FtpsOnly"
     health_check_path = var.health_check_path
-    http2_enabled = true
+    http2_enabled     = true
   }
 
   logs {
     detailed_error_messages = true
-    failed_request_tracing = true
+    failed_request_tracing  = true
   }
 }
 

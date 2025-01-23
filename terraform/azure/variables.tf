@@ -56,7 +56,7 @@ variable "acr_sku" {
   type        = string
   description = "SKU for the ACR."
   # Standard not Basic to allow for vulnerability scanning.
-  default     = "Standard"
+  default = "Standard"
 }
 
 # Storage Account.

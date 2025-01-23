@@ -1,17 +1,17 @@
 variable "project_id" {
-  type    = string
+  type = string
 }
 
 variable "project_number" {
-  type    = string
+  type = string
 }
 
 variable "region" {
-  type    = string
+  type = string
 }
 
 variable "location" {
-  type    = string
+  type = string
 }
 
 variable "name" {
@@ -20,7 +20,7 @@ variable "name" {
 }
 
 variable "image_name" {
-  type    = string
+  type = string
 }
 
 variable "api_hash" {
@@ -28,7 +28,7 @@ variable "api_hash" {
 }
 
 variable "gcp_credentials_path" {
-  type    = string
+  type = string
 }
 
 variable "db_user" {
