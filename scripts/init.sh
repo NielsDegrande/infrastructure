@@ -5,10 +5,10 @@ Initialize infrastructure deployments.
 Typically you only need to run this once.
 
 Takes as inputs:
-* CSP: Cloud Service Provider. E.g., `azure` or `gcp`.
+* CSP: Cloud Service Provider. E.g., azure or gcp.
 * IDENTIFIER: The identifier for the CSP. E.g., the subscription id for Azure or the project id for GCP.
 
-Example: `CSP=azure IDENTIFIER=1234 bash scripts/init.sh`.
+Example: CSP=azure IDENTIFIER=1234 bash scripts/init.sh.
 "
 
 if [ "$CSP" = "azure" ]; then
@@ -27,5 +27,5 @@ fi
 # Terraform initialization.
 (
   cd "terraform/$CSP" || exit
-  terraform init -backend-config="terraform/$CSP/backend.conf"
+  terraform init -upgrade -backend-config="backend.conf"
 )

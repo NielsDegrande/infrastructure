@@ -41,7 +41,7 @@ jobs:
           path: "ui"
 
       - name: Install Terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v3
 
       - name: Initialize
         run: |

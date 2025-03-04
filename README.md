@@ -63,7 +63,7 @@ Initialize (one-time setup) with
 
 ```shell
 # NOTE: Populate the variables.
-CSP= IDENTIFIER= bash scripts/init.sh`.
+CSP= IDENTIFIER= bash scripts/init.sh.
 ```
 
 For local use, you can create symbolic links to the API and UI repository.
