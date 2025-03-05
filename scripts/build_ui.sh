@@ -3,7 +3,7 @@
 : "
 Build the UI.
 
-Example: `bash scripts/build_ui.sh`.
+Example: bash scripts/build_ui.sh.
 "
 
 # Stop upon error and undefined variables.
@@ -16,5 +16,5 @@ set -eux
     bun run build
 
 )
-mv ui/dist/* api/ui/
+rsync -av --remove-source-files ui/dist/ api/ui/
 cp -R ui/public api/ui/

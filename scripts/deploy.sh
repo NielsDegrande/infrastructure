@@ -4,14 +4,14 @@
 Use Terraform to deploy the infrastructure.
 
 Takes as inputs:
-* CSP: Cloud Service Provider. E.g., `azure` or `gcp`.
+* CSP: Cloud Service Provider. E.g., azure or gcp.
 * IDENTIFIER: The identifier for the CSP. E.g., the subscription id for Azure or the project id for GCP.
 * REGISTRY_NAME: The name of the container registry.
 * REPOSITORY_NAME: The name of the repository.
 
 Examples:
-* `CSP=azure REGISTRY_NAME=myregistry REPOSITORY_NAME=myrepository bash scripts/deploy.sh`.
-* `CSP=gcp IDENTIFIER=1234 REGISTRY_NAME=europe-west1 REPOSITORY_NAME=myrepository bash scripts/deploy.sh`.
+* CSP=azure REGISTRY_NAME=myregistry REPOSITORY_NAME=myrepository bash scripts/deploy.sh.
+* CSP=gcp IDENTIFIER=1234 REGISTRY_NAME=europe-west1 REPOSITORY_NAME=myrepository bash scripts/deploy.sh.
 "
 
 # Stop upon error and undefined variables.
