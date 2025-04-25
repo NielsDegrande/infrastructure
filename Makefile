@@ -9,8 +9,9 @@ help:
 ## install_dev: Install dependencies for development.
 .PHONY: install_dev
 install_dev:
-	pip install pre-commit
-	pre-commit install
+	uv venv --python 3.13
+	. .venv/bin/activate && uv pip install pre-commit
+	. .venv/bin/activate && uv run pre-commit install
 
 ## build_test: Build the test image.
 .PHONY: build_test

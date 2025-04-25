@@ -15,12 +15,13 @@ You need to install the CLI tool for the cloud provider you are using:
 
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
 - [gcloud CLI](https://cloud.google.com/sdk/docs/install)
+- uv (Astral's Python environment manager)
 
 ### Installation
 
+Set up your development environment:
+
 ```shell
-python3 -m venv venv
-source venv/bin/activate
 make install_dev
 ```
 
