@@ -24,24 +24,24 @@ jobs:
 
     steps:
       - name: Checkout infrastructure repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Checkout api repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: "https://github.com/NielsDegrande/api"
           token: ${{ secrets.GITHUB_TOKEN }}
           path: "api"
 
       - name: Checkout ui repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: "https://github.com/NielsDegrande/ui"
           token: ${{ secrets.GITHUB_TOKEN }}
           path: "ui"
 
       - name: Install Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
 
       - name: Initialize
         run: |
