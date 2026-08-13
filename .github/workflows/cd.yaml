@@ -26,22 +26,26 @@ jobs:
       - name: Checkout infrastructure repository
         uses: actions/checkout@v7
 
+      # NOTE: secrets.GITHUB_TOKEN cannot access other private repositories.
+      # Use a PAT or a GitHub App token with access to the api and ui repositories.
       - name: Checkout api repository
         uses: actions/checkout@v7
         with:
-          repository: "https://github.com/NielsDegrande/api"
+          repository: "NielsDegrande/api"
           token: ${{ secrets.GITHUB_TOKEN }}
           path: "api"
 
       - name: Checkout ui repository
         uses: actions/checkout@v7
         with:
-          repository: "https://github.com/NielsDegrande/ui"
+          repository: "NielsDegrande/ui"
           token: ${{ secrets.GITHUB_TOKEN }}
           path: "ui"
 
-      - name: Install Terraform
-        uses: hashicorp/setup-terraform@v4
+      - name: Install OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.12.5
 
       - name: Initialize
         run: |
@@ -49,8 +53,8 @@ jobs:
 
       - name: Deploy
         run: |
-          CSP={{ env.CSP }}
-          IDENTIFIER={{ env.IDENTIFIER }}
-          REGISTRY_NAME={{ env.REGISTRY_NAME }}
-          REPOSITORY_NAME={{ env.REPOSITORY_NAME }}
+          CSP=${{ env.CSP }}
+          IDENTIFIER=${{ env.IDENTIFIER }}
+          REGISTRY_NAME=${{ env.REGISTRY_NAME }}
+          REPOSITORY_NAME=${{ env.REPOSITORY_NAME }}
           bash scripts/deploy.sh
