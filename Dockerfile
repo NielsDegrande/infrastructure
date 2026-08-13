@@ -7,7 +7,7 @@ WORKDIR /app/
 
 # Dependencies for pre-commit and Terraform.
 RUN apt-get update \
-    && apt-get install -y git build-essential shellcheck gnupg software-properties-common curl
+    && apt-get install -y git build-essential shellcheck gnupg lsb-release curl
 
 # Install Terraform.
 RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null \
