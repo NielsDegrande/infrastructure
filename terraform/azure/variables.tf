@@ -127,39 +127,47 @@ variable "identity_suffix" {
 # App Service.
 
 variable "app_service_plan_name_suffix" {
+  type        = string
   description = "The name of the App Service Plan."
   default     = "appservice-plan"
 }
 
 variable "app_service_name_suffix" {
+  type        = string
   description = "The name of the App Service."
   default     = "appservice"
 }
 
 variable "log_analytics_name_suffix" {
+  type        = string
   description = "The name of the Log Analytics Workspace."
   default     = "loganalyticsworkspace"
 }
 
 variable "diagnostics_suffix" {
+  type        = string
   description = "The suffix to append to the diagnostics settings name."
   default     = "diagnostics"
 }
 
 variable "app_service_sku" {
+  type        = string
   description = "The SKU of the App Service."
   default     = "P1v3"
 }
 
 variable "docker_registry_url" {
+  type        = string
   description = "The Docker registry URL."
 }
 
 variable "docker_image_name" {
+  type        = string
   description = "The Docker image to deploy."
 }
 
 variable "health_check_path" {
+  type        = string
   description = "The health check path for the App Service."
   default     = "/api/docs"
 }

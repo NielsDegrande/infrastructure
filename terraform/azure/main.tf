@@ -1,10 +1,10 @@
 terraform {
-  required_version = ">= 1.15"
+  required_version = ">= 1.10"
 
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "5.0.1"
+      version = "~> 5.0"
     }
   }
 
@@ -122,6 +122,22 @@ resource "azurerm_storage_account" "storage_account" {
   depends_on = [azurerm_key_vault_key.key_vault_key]
 }
 
+# Store storage credentials in Key Vault so that
+# the App Service reads them through Key Vault references.
+resource "azurerm_key_vault_secret" "blob_account_key" {
+  name         = "blob-account-key"
+  value        = azurerm_storage_account.storage_account.primary_access_key
+  key_vault_id = azurerm_key_vault.key_vault.id
+  content_type = "text/plain"
+}
+
+resource "azurerm_key_vault_secret" "blob_connection_string" {
+  name         = "blob-connection-string"
+  value        = azurerm_storage_account.storage_account.primary_connection_string
+  key_vault_id = azurerm_key_vault.key_vault.id
+  content_type = "text/plain"
+}
+
 resource "azurerm_storage_container" "storage_container" {
   for_each              = toset(var.container_names)
   name                  = each.value
@@ -145,14 +161,20 @@ resource "azurerm_linux_web_app" "app_service" {
   client_certificate_enabled = true
   https_only                 = true
 
+  identity {
+    type = "SystemAssigned"
+  }
+
+  # Secrets are resolved from Key Vault at runtime through Key Vault references,
+  # so that no secret values are materialized in the App Service configuration.
   app_settings = {
-    BLOB_ACCOUNT_KEY       = azurerm_storage_account.storage_account.primary_access_key
+    BLOB_ACCOUNT_KEY       = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.blob_account_key.versionless_id})"
     BLOB_ACCOUNT_NAME      = azurerm_storage_account.storage_account.name
-    BLOB_CONNECTION_STRING = azurerm_storage_account.storage_account.primary_connection_string
+    BLOB_CONNECTION_STRING = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.blob_connection_string.versionless_id})"
     DB_DIALECT             = "postgresql+asyncpg"
     DB_HOST                = azurerm_postgresql_flexible_server.database.fqdn
     DB_NAME                = "postgres"
-    DB_PASSWORD            = data.azurerm_key_vault_secret.db_password.value
+    DB_PASSWORD            = "@Microsoft.KeyVault(SecretUri=${data.azurerm_key_vault_secret.db_password.versionless_id})"
     DB_PORT                = "5432"
     DB_USER                = var.database_administrator_login
     ENVIRONMENT            = var.environment
@@ -175,6 +197,17 @@ resource "azurerm_linux_web_app" "app_service" {
     detailed_error_messages = true
     failed_request_tracing  = true
   }
+}
+
+# Allow the App Service managed identity to resolve Key Vault references.
+resource "azurerm_key_vault_access_policy" "app_service_secret_access" {
+  key_vault_id = azurerm_key_vault.key_vault.id
+  tenant_id    = data.azurerm_client_config.current.tenant_id
+  object_id    = azurerm_linux_web_app.app_service.identity[0].principal_id
+
+  secret_permissions = [
+    "Get",
+  ]
 }
 
 resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
