@@ -3,13 +3,13 @@
 ## Introduction
 
 This repository holds infrastructure as code.
-Terraform is used to provision the infrastructure.
+OpenTofu is used to provision the infrastructure.
 
 ## Getting Started
 
 ### Prerequisites
 
-- [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)
+- [OpenTofu](https://opentofu.org/docs/intro/install/)
 
 You need to install the CLI tool for the cloud provider you are using:
 
@@ -32,6 +32,15 @@ you need to install ShellCheck, e.g. with:
 brew install shellcheck
 ```
 
+The pre-commit hooks for OpenTofu come from
+[pre-commit-terraform](https://github.com/antonbabenko/pre-commit-terraform).
+When running them outside the provided Docker image,
+point them at the OpenTofu binary:
+
+```shell
+export PCT_TFPATH=tofu
+```
+
 ### Create a backend
 
 This is a one-time setup. It is not part of this infra-as-code.
@@ -39,8 +48,8 @@ Populate the `backend.conf` with the required values.
 
 #### Azure
 
-Create a storage account and a container to store the Terraform state.
-NOTE: It might be required to add the `object_id` of the principal running `terraform apply` to the key vault with Get key permissions.
+Create a storage account and a container to store the OpenTofu state.
+NOTE: It might be required to add the `object_id` of the principal running `tofu apply` to the key vault with Get key permissions.
 
 ##### First-Time Setup
 
@@ -49,14 +58,18 @@ A first deploy will typically fail because the Key Vault is not yet populated wi
 One can deploy the Key Vault separately:
 
 ```shell
-terraform apply -target=azurerm_key_vault.key_vault
+tofu apply -target=azurerm_key_vault.key_vault
 ```
 
-Then manually add the "db-password" secret in the Key Vault. Then run `terraform apply` again to finish the deployment.
+Then manually add the "db-password" secret in the Key Vault. Then run `tofu apply` again to finish the deployment.
 
 #### GCP
 
-Create a bucket to store the Terraform state.
+Create a bucket to store the OpenTofu state.
+
+No service account keys are exported by this configuration.
+Workloads rely on ambient credentials,
+such as the service account attached to Cloud Run or workload identity federation.
 
 ## Infrastructure Setup
 
@@ -90,5 +103,5 @@ CSP= IDENTIFIER= REGISTRY_NAME= REPOSITORY_NAME= bash scripts/deploy.sh
 
 - Create a separate backend, e.g., `backend.conf`, for each environment.
 - Create a separate `terraform.tfvars` for each environment.
-- Use the `-backend-config` flag with `terraform init` to specify the backend configuration file.
-- Use the `-var-file` flag with `terraform plan` and `terraform apply` to specify the variables file.
+- Use the `-backend-config` flag with `tofu init` to specify the backend configuration file.
+- Use the `-var-file` flag with `tofu plan` and `tofu apply` to specify the variables file.

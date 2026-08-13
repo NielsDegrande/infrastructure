@@ -24,8 +24,8 @@ else
   exit 1
 fi
 
-# Terraform initialization.
+# OpenTofu initialization.
 (
   cd "terraform/$CSP" || exit
-  terraform init -upgrade -backend-config="backend.conf"
+  tofu init -upgrade -backend-config="backend.conf"
 )

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 : "
-Use Terraform to deploy the infrastructure.
+Use OpenTofu to deploy the infrastructure.
 
 Takes as inputs:
 * CSP: Cloud Service Provider. E.g., azure or gcp.
@@ -29,5 +29,5 @@ CSP="$CSP" IDENTIFIER="$IDENTIFIER" REGISTRY_NAME="$REGISTRY_NAME" REPOSITORY_NA
 
 (
   cd "terraform/$CSP" || exit
-  terraform apply
+  tofu apply
 )

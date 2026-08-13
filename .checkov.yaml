@@ -17,6 +17,7 @@ skip-check:
   - CKV_AZURE_237 # ACR dedicated data endpoint is disabled.
   - CKV_AZURE_33 # Storage logging for Queue service.
   - CKV_AZURE_40 # Set an expiration date on all keys.
+  - CKV_AZURE_41 # Set an expiration date on all secrets: values track storage credentials managed here.
   - CKV_AZURE_59 # Disallow public access on storage accounts.
   - CKV_AZURE_63 # Enable HTTP logging.
   - CKV_AZURE_71 # Managed identity provider for App Services.

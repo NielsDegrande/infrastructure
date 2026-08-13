@@ -27,10 +27,6 @@ variable "api_hash" {
   type = string
 }
 
-variable "gcp_credentials_path" {
-  type = string
-}
-
 variable "db_user" {
   type    = string
   default = "postgres"
