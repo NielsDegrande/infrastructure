@@ -39,6 +39,13 @@ repos:
     hooks:
       - id: terraform_fmt
         # args: ["-recursive"]
+      - id: terraform_validate
+        args:
+          - --tf-init-args=-backend=false
+          - --hook-config=--retry-once-with-cleanup=true
+      - id: terraform_tflint
+        args:
+          - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
   - repo: https://github.com/bridgecrewio/checkov
     rev: 3.3.10
     hooks:
