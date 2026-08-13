@@ -1,10 +1,14 @@
 terraform {
-  required_version = ">= 1.15"
+  required_version = ">= 1.10"
 
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = ">= 7.44.0"
+      version = "~> 7.44"
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.3"
     }
   }
 
@@ -21,38 +25,26 @@ resource "google_service_account" "gcs_sign_url_service_account" {
   display_name = "Service account to create signed URLs for Google Cloud Storage."
 }
 
-resource "google_project_iam_binding" "storage_role_for_gcs_sign_url_service_account" {
-  project = var.project_id
-  role    = "roles/storage.editor"
-  members = [
-    "serviceAccount:${google_service_account.gcs_sign_url_service_account.email}",
-  ]
+# NOTE: No service account keys are exported.
+# Workloads authenticate with ambient credentials instead:
+# the attached service account on Cloud Run or workload identity federation elsewhere.
+# Signed URLs can be created through the IAM signBlob API rather than a key file.
+resource "google_storage_bucket_iam_member" "object_admin_for_gcs_sign_url_service_account" {
+  bucket = google_storage_bucket.create_bucket.name
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${google_service_account.gcs_sign_url_service_account.email}"
 }
 
-resource "google_service_account_key" "gcs_sign_url_key" {
-  service_account_id = google_service_account.gcs_sign_url_service_account.name
-  public_key_type    = "TYPE_X509_PEM_FILE"
+resource "google_storage_bucket_iam_member" "object_admin_for_compute_engine_default_service_account" {
+  bucket = google_storage_bucket.create_bucket.name
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${var.project_number}-compute@developer.gserviceaccount.com"
 }
 
-resource "local_file" "service_account_key_file" {
-  content  = base64decode(google_service_account_key.gcs_sign_url_key.private_key)
-  filename = "${path.module}/../.secrets/application_default_credentials.json"
-}
-
-resource "google_project_iam_binding" "storage_role_for_compute_engine_default_service_account" {
-  project = var.project_id
-  role    = "roles/storage.editor"
-  members = [
-    "serviceAccount:${var.project_number}-compute@developer.gserviceaccount.com",
-  ]
-}
-
-resource "google_project_iam_binding" "cloudsql_role_for_compute_engine_default_service_account" {
+resource "google_project_iam_member" "cloudsql_role_for_compute_engine_default_service_account" {
   project = var.project_id
   role    = "roles/cloudsql.editor"
-  members = [
-    "serviceAccount:${var.project_number}-compute@developer.gserviceaccount.com",
-  ]
+  member  = "serviceAccount:${var.project_number}-compute@developer.gserviceaccount.com"
 }
 
 
@@ -139,10 +131,8 @@ resource "null_resource" "docker_build_api" {
   }
 
   triggers = {
-    always_run = "${timestamp()}"
+    always_run = timestamp()
   }
-
-  depends_on = [local_file.service_account_key_file]
 }
 
 resource "null_resource" "docker_tag_api" {
@@ -151,7 +141,7 @@ resource "null_resource" "docker_tag_api" {
   }
 
   triggers = {
-    always_run = "${timestamp()}"
+    always_run = timestamp()
   }
 }
 
@@ -161,7 +151,7 @@ resource "null_resource" "docker_push_api" {
   }
 
   triggers = {
-    always_run = "${timestamp()}"
+    always_run = timestamp()
   }
 
   depends_on = [google_artifact_registry_repository.artifact_repository, null_resource.docker_tag_api]
@@ -204,10 +194,6 @@ resource "google_cloud_run_v2_service" "run_service" {
       env {
         name  = "DB_PASSWORD"
         value = var.db_password
-      }
-      env {
-        name  = "GOOGLE_APPLICATION_CREDENTIALS"
-        value = var.gcp_credentials_path
       }
       env {
         name  = "GCS_BUCKET_NAME"
