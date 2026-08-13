@@ -45,7 +45,7 @@ variable "database_sku" {
 variable "database_version" {
   type        = string
   description = "Database version."
-  default     = "16"
+  default     = "17"
 }
 
 # Container Registry.

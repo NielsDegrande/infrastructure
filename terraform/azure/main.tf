@@ -1,10 +1,10 @@
 terraform {
-  required_version = ">= 1.8"
+  required_version = ">= 1.15"
 
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.14.0"
+      version = "5.0.1"
     }
   }
 
@@ -36,6 +36,8 @@ resource "azurerm_key_vault" "key_vault" {
   sku_name                   = var.kv_sku
   purge_protection_enabled   = true
   soft_delete_retention_days = 7
+  # Access is managed through access policies, not RBAC.
+  rbac_authorization_enabled = false
 }
 
 resource "azurerm_postgresql_flexible_server" "database" {
@@ -194,7 +196,7 @@ resource "azurerm_monitor_diagnostic_setting" "app_service_logs" {
     category = "AppServiceConsoleLogs"
   }
 
-  metric {
+  enabled_metric {
     category = "AllMetrics"
   }
 }

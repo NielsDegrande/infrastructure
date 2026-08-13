@@ -9,7 +9,7 @@ help:
 ## install_dev: Install dependencies for development.
 .PHONY: install_dev
 install_dev:
-	uv venv --python 3.13
+	uv venv --python 3.14
 	. .venv/bin/activate && uv pip install pre-commit
 	. .venv/bin/activate && uv run pre-commit install
 

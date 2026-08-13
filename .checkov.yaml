@@ -26,6 +26,7 @@ skip-check:
   - CKV2_AZURE_33 # Storage account with private endpoint.
   - CKV2_AZURE_40 # Shared key access to storage account.
   - CKV2_AZURE_41 # SAS expiration policy: Check not working.
+  - CKV2_AZURE_57 # Private endpoint for PostgreSQL Flexible Server.
   - CKV_DOCKER_2 # Health check added to Dockerfile.
   - CKV_DOCKER_3 # Ensure that a user for the container has been created.
   - CKV_GCP_102 # Anonymous access of Cloud Run.

@@ -1,8 +1,11 @@
 terraform {
-  required_version = ">= 1.8"
+  required_version = ">= 1.15"
 
   required_providers {
-    google = ">= 6.3.0"
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 7.44.0"
+    }
   }
 
   backend "gcs" {}
@@ -40,7 +43,7 @@ resource "google_project_iam_binding" "storage_role_for_compute_engine_default_s
   project = var.project_id
   role    = "roles/storage.editor"
   members = [
-    "serviceAccount:${var.project_number}-compute@developer.gserviceaccount.com ",
+    "serviceAccount:${var.project_number}-compute@developer.gserviceaccount.com",
   ]
 }
 
@@ -48,14 +51,14 @@ resource "google_project_iam_binding" "cloudsql_role_for_compute_engine_default_
   project = var.project_id
   role    = "roles/cloudsql.editor"
   members = [
-    "serviceAccount:${var.project_number}-compute@developer.gserviceaccount.com ",
+    "serviceAccount:${var.project_number}-compute@developer.gserviceaccount.com",
   ]
 }
 
 
 resource "google_sql_database_instance" "db" {
   name             = "${var.name}-db"
-  database_version = "POSTGRES_15"
+  database_version = "POSTGRES_18"
   region           = var.region
 
   settings {
@@ -63,7 +66,7 @@ resource "google_sql_database_instance" "db" {
     edition = "ENTERPRISE_PLUS"
 
     backup_configuration {
-      enabled = True
+      enabled = true
     }
     database_flags {
       name  = "log_duration"
@@ -267,7 +270,7 @@ resource "google_storage_bucket" "create_bucket" {
 
   public_access_prevention    = "enforced"
   uniform_bucket_level_access = true
-  versioning = {
+  versioning {
     enabled = true
   }
 }
